@@ -41,8 +41,9 @@ def getDataPoint(quote):
 
 def getRatio(price_a, price_b):
     """ Get ratio of price_a and price_b """
-    """ ------------- Update this function ------------- """
-    return 1
+    if price_b == 0:
+        return None # Avoid division by zero
+    return price_a / price_b  # Calculate the ratio correctly
 
 
 # Main
@@ -51,9 +52,23 @@ if __name__ == "__main__":
     for _ in iter(range(N)):
         quotes = json.loads(urllib.request.urlopen(QUERY.format(random.random())).read())
 
-        """ ----------- Update to get the ratio --------------- """
+        # Initialize variables to store prices for calculating the ratio
+        price_a = None
+        price_b = None
         for quote in quotes:
             stock, bid_price, ask_price, price = getDataPoint(quote)
+            
+            # Decide which prices to use for your ratio calculation
+            if price_a is None:
+                price_a = price
+            elif price_b is None:
+                price_b = price
+
             print("Quoted %s at (bid:%s, ask:%s, price:%s)" % (stock, bid_price, ask_price, price))
 
-        print("Ratio %s" % getRatio(price, price))
+        # Check if both prices are available before calculating the ratio
+        if price_a is not None and price_b is not None:
+            ratio = getRatio(price_a, price_b)
+            print("Ratio %s" % ratio)
+        else:
+            print("Cannot calculate ratio as one or both prices are missing.")
